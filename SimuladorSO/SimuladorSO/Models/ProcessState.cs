@@ -10,6 +10,7 @@ namespace SimuladorSO.Models
     {
         Pronto,
         Executando,
-        Bloqueado
+        Bloqueado,
+        Finalizado
     }
 }

@@ -18,9 +18,9 @@ namespace SimuladorSO
             Escalonador escalonador = new Escalonador(gm);
 
             // Adiciona processos ao sistema
-            escalonador.AdicionarProcesso(new Processo(1, "Notepad", 10));
-            escalonador.AdicionarProcesso(new Processo(2, "Paint", 20));
-            escalonador.AdicionarProcesso(new Processo(3, "Chrome", 50));
+            escalonador.AdicionarProcesso(new Processo(1, "Notepad", 10, 5));
+            escalonador.AdicionarProcesso(new Processo(2, "Paint", 20, 15));
+            escalonador.AdicionarProcesso(new Processo(3, "Chrome", 50, 30));
 
             Console.WriteLine("\n--- Iniciando Simulação do Sistema Operacional ---\n");
 

@@ -12,6 +12,7 @@ namespace SimuladorSO.Core
     {
         private Queue<Processo> processosProntos;
         private GerenciadorDeMemoria gerenciadorMemoria;
+        private int quantum = 2;
 
         public Escalonador(GerenciadorDeMemoria gm)
         {
@@ -55,16 +56,33 @@ namespace SimuladorSO.Core
         {
             if (processosProntos.Count > 0)
             {
-                Processo processoAtual = processosProntos.Dequeue();
+
+                Processo processoAtual = processosProntos.Peek();
 
                 processoAtual.Status = ProcessState.Executando;
+                if (processoAtual.QuantumRestante == 0)
+                {
+                    processoAtual.QuantumRestante = quantum;
+                }
                 Console.WriteLine($"--> Executando processo ID: {processoAtual.ID} ({processoAtual.Nome})");
 
                 Thread.Sleep(500);
                 processoAtual.TempoDeExecucao += 1;
+                processoAtual.QuantumRestante -= 1;
 
-                processoAtual.Status = ProcessState.Pronto;
-                processosProntos.Enqueue(processoAtual);
+                if (processoAtual.TempoDeExecucao >= processoAtual.TempoTotal)
+                {
+                    processoAtual.Status = ProcessState.Finalizado;
+                    Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}.");
+                    gerenciadorMemoria.Liberar(processoAtual);
+                    processosProntos.Dequeue();
+                }
+                else if (processoAtual.QuantumRestante == 0)
+                {
+                    processoAtual.Status = ProcessState.Pronto;
+                    processosProntos.Dequeue();
+                    processosProntos.Enqueue(processoAtual);
+                }
             }
             else
             {
