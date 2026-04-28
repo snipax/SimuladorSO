@@ -12,17 +12,20 @@ namespace SimuladorSO.Models
         public string Nome { get; private set; }
         public ProcessState Status { get; set; }
         public int TempoDeExecucao { get; set; }
+        public int TempoTotal { get; private set; }
+        public int QuantumRestante { get; set; }
         public int TamanhoMemoria { get; private set; }
         public int EnderecoInicialMemoria { get; set; }
 
-        public Processo(int id, string nome, int tamanhoMemoria)
+        public Processo(int id, string nome, int tamanhoMemoria, int tempototal)
         {
             ID = id;
             Nome = nome;
             TamanhoMemoria = tamanhoMemoria;
             Status = ProcessState.Pronto;
-            TempoDeExecucao = 0;
-            EnderecoInicialMemoria = -1;
+            TempoTotal = tempototal;
+            TempoDeExecucao = 0; 
+            EnderecoInicialMemoria = -1; // Indica que a memória ainda não foi alocada
         }
     }
 }
