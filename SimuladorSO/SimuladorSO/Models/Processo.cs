@@ -14,6 +14,7 @@ namespace SimuladorSO.Models
         public int TempoDeExecucao { get; set; }
         public int TempoTotal { get; private set; }
         public int QuantumRestante { get; set; }
+        public int TempoBloqueioRestante { get; set; }
         public int TamanhoMemoria { get; private set; }
         public int EnderecoInicialMemoria { get; set; }
 

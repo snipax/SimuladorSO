@@ -24,23 +24,68 @@ namespace SimuladorSO
 
             Console.WriteLine("\n--- Iniciando Simulação do Sistema Operacional ---\n");
 
-            // Simula alguns ciclos e depois para um processo
-            for (int i = 0; i < 5; i++)
-            {
-                escalonador.ExecutarCicloDaCPU();
-                Thread.Sleep(1000);
-            }
-
-            Console.WriteLine("\n--- Tentando parar o processo 2 (Paint) ---\n");
-            escalonador.PararProcesso(2);
-
-            Console.WriteLine("\n--- Continunando a simulação ---\n");
-
-            // Loop principal infinito
+            int ciclos = 0;
             while (true)
             {
                 escalonador.ExecutarCicloDaCPU();
-                Thread.Sleep(1000);
+                ciclos++;
+
+                if (ciclos % 5 == 0)
+                {
+                    Console.WriteLine("--- comando (add, stop, block, list, continue, exit) ---");
+                    string option = Console.ReadLine();
+                    option = option.ToLowerInvariant();
+                    switch (option) 
+                    {
+                        case "add":
+                            Console.WriteLine("--- Adicionar Processo ---");
+                            Console.WriteLine("Digite o ID do processo:");
+                            int.TryParse(Console.ReadLine(), out int id);
+                            Console.WriteLine("Digite o nome do processo:");
+                            string nome = Console.ReadLine();
+                            Console.WriteLine("Digite o tamanho de memória necessário (em MB):");
+                            int.TryParse(Console.ReadLine(), out int memoria);
+                            Console.WriteLine("Digite o tempo total de execução:");
+                            int.TryParse(Console.ReadLine(), out int tempoTotal);
+                            escalonador.AdicionarProcesso(new Processo(id, nome, memoria, tempoTotal));
+                            break;
+
+                        case "stop":
+                            Console.WriteLine("--- Parar Processo ---");
+                            escalonador.ListarProcessos();
+                            Console.WriteLine("Digite o ID do processo a ser parado:");
+                            int.TryParse(Console.ReadLine(), out int idParar);
+                            escalonador.PararProcesso(idParar);
+                            break;
+
+                        case "block":
+                            Console.WriteLine("--- Bloquear Processo ---");
+                            escalonador.ListarProcessos();
+                            Console.WriteLine("Digite o ID do processo a ser bloqueado:");
+                            int.TryParse(Console.ReadLine(), out int idBloquear);
+                            Console.WriteLine("Digite o tempo de bloqueio em ciclos (espera de IO)");
+                            int.TryParse(Console.ReadLine(), out int tempoBloqueio);
+                            escalonador.BloquearProcesso(idBloquear, tempoBloqueio);
+                            break;
+
+                        case "list":
+                            Console.WriteLine("--- Listar Processos ---");
+                            escalonador.ListarProcessos();
+                            break;
+
+                        case "continue":
+                            Console.WriteLine("--- Continuando simulaçao ---");
+                            break;
+
+                        case "exit":
+                            Console.WriteLine("--- Encerrando Simulação ---");
+                            return;
+
+                        default:
+                            Console.WriteLine("--- comando (add, stop, block, list, continue, exit) ---");
+                            break;
+                    }
+                }
             }
         }
     }
