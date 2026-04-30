@@ -11,12 +11,11 @@ namespace SimuladorSO.Core
     public class Escalonador
     {
         
-        private Queue<Processo> processosBloqueados;
-        private Queue<Processo> processosPrioridadeAlta;
-        private Queue<Processo> processosPrioridadeMedia;
-        private Queue<Processo> processosPrioridadeBaixa;
-        private Queue<Processo> processosFinalizados;
-
+        public Queue<Processo> processosBloqueados { get; private set; }
+        public Queue<Processo> processosPrioridadeAlta { get; private set; }
+        public Queue<Processo> processosPrioridadeMedia { get; private set; }
+        public Queue<Processo> processosPrioridadeBaixa { get; private set; }
+        public Queue<Processo> processosFinalizados { get; private set; }
         private GerenciadorDeMemoria gerenciadorMemoria;
         private int quantum = 2;
         private int ciclos = 0;
@@ -189,6 +188,36 @@ namespace SimuladorSO.Core
             Console.WriteLine($"Tempo médio de execução: {(double)tempoExecucaoTotal / quantidadeProcessos}");
             Console.WriteLine($"Tempo médio de turnaround: {(double)tempoTurnaroundTotal / quantidadeProcessos}");
             Console.WriteLine($"Throughput: {(double)quantidadeProcessos / ciclos}");
+        }
+
+        public void ExibirTabelaDePaginas(int processoId)
+        {
+            List<Processo> listaTemporaria = processosPrioridadeAlta.ToList().Concat(processosPrioridadeMedia).Concat(processosPrioridadeBaixa).ToList();
+            List<Processo> listaTemporariaBloqueados = processosBloqueados.ToList();
+            Processo processo = listaTemporaria.FirstOrDefault(p => p.ID == processoId);
+            if (processo == null)
+            {
+                processo = listaTemporariaBloqueados.FirstOrDefault(p => p.ID == processoId);
+            }
+            if (processo != null)
+            {
+                Console.WriteLine($"Tabela de Páginas para o Processo {processo.ID} ({processo.Nome}):");
+                if (processo.TabelaPaginas.Count > 0)
+                {
+                    for (int i = 0; i < processo.TabelaPaginas.Count; i++)
+                    { 
+                        Console.WriteLine($"Página {i} -> Frame {processo.TabelaPaginas[i]}"); 
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nenhuma página alocada.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Processo com ID {processoId} não encontrado na fila.");
+            }
         }
 
 

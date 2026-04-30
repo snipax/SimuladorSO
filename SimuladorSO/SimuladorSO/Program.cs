@@ -14,7 +14,7 @@ namespace SimuladorSO
         public static void Main(string[] args)
         {
             // Inicializa os componentes do SO
-            GerenciadorDeMemoria gm = new GerenciadorDeMemoria(128); // 128MB de RAM simulada
+            GerenciadorDeMemoria gm = new GerenciadorDeMemoria(128, 4); // 128MB de RAM simulada
             Escalonador escalonador = new Escalonador(gm);
 
             // Adiciona processos ao sistema
@@ -32,7 +32,7 @@ namespace SimuladorSO
 
                 if (ciclos % 5 == 0)
                 {
-                    Console.WriteLine("--- comando (add, stop, block, list, metrics, continue, exit) ---");
+                    Console.WriteLine("--- comando (add, stop, block, list, metrics, pages, continue, exit) ---");
                     string option = Console.ReadLine();
                     option = option.ToLowerInvariant();
                     switch (option) 
@@ -81,6 +81,15 @@ namespace SimuladorSO
                             escalonador.ExibirMetricas();
                             break;
 
+                        case "pages":
+                            Console.WriteLine("--- Tabelas de Páginas --- ");
+                            escalonador.ListarProcessos();
+                            Console.WriteLine("Digite o ID do processo para ver a tabela de páginas:");
+                            int.TryParse(Console.ReadLine(), out int idPaginas);
+
+                            escalonador.ExibirTabelaDePaginas(idPaginas);
+                            break;
+
                         case "continue":
                             Console.WriteLine("--- Continuando simulaçao ---");
                             break;
@@ -90,7 +99,7 @@ namespace SimuladorSO
                             return;
 
                         default:
-                            Console.WriteLine("--- comando (add, stop, block, list, metrics, continue, exit) ---");
+                            Console.WriteLine("--- comando (add, stop, block, list, metrics, pages, continue, exit) ---");
                             break;
                     }
                 }

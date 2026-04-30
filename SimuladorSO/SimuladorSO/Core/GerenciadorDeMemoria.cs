@@ -9,58 +9,60 @@ namespace SimuladorSO.Core
 {
     public class GerenciadorDeMemoria
     {
-        private bool[] blocosDeMemoria;
+        private bool[] paginas;
+        private int tamanhoPagina;
 
-        public GerenciadorDeMemoria(int tamanhoTotal)
+        public GerenciadorDeMemoria(int tamanhoTotal, int tamanhopagina)
         {
-            blocosDeMemoria = new bool[tamanhoTotal];
+            paginas = new bool[tamanhoTotal / tamanhopagina];
+            tamanhoPagina = tamanhopagina;
         }
 
         public bool Alocar(Processo processo)
         {
-            int blocosNecessarios = processo.TamanhoMemoria;
-            int blocosLivresConsecutivos = 0;
-            int indiceInicial = -1;
+            int paginasNecessarias = (int)Math.Ceiling((double)processo.TamanhoMemoria / tamanhoPagina);
+            processo.TabelaPaginas.Clear();
 
-            for (int i = 0; i < blocosDeMemoria.Length; i++)
+            for (int i = 0; i < paginas.Length; i++)
             {
-                if (!blocosDeMemoria[i])
+                if (!paginas[i])
                 {
-                    if (blocosLivresConsecutivos == 0)
-                        indiceInicial = i;
-                    blocosLivresConsecutivos++;
-                }
-                else
-                {
-                    blocosLivresConsecutivos = 0;
-                    indiceInicial = -1;
-                }
-
-                if (blocosLivresConsecutivos >= blocosNecessarios)
-                {
-                    processo.EnderecoInicialMemoria = indiceInicial;
-                    for (int j = 0; j < blocosNecessarios; j++)
+                    paginas[i] = true;
+                    processo.TabelaPaginas.Add(i); // Mapeia a página para o processo
+                    paginasNecessarias--;
+                    if (paginasNecessarias == 0)
                     {
-                        blocosDeMemoria[indiceInicial + j] = true;
+                        Console.WriteLine($"Páginas alocadas para o Processo {processo.ID}: {string.Join(", ", processo.TabelaPaginas)}");
+                        return true;
                     }
-                    Console.WriteLine($"Memória alocada para o Processo {processo.ID} no endereço {indiceInicial}.");
-                    return true;
                 }
             }
+            for (int i = 0; i < processo.TabelaPaginas.Count; i++)
+            {
+                paginas[processo.TabelaPaginas[i]] = false; // Libera a página
+            }
+            processo.TabelaPaginas.Clear();
             Console.WriteLine($"Falha ao alocar memória para o Processo {processo.ID}. Espaço insuficiente.");
             return false;
         }
 
         public void Liberar(Processo processo)
         {
-            if (processo.EnderecoInicialMemoria != -1)
+            if (processo.TabelaPaginas != null)
             {
-                for (int i = 0; i < processo.TamanhoMemoria; i++)
+                for (int i = 0; i < processo.TabelaPaginas.Count; i++)
                 {
-                    blocosDeMemoria[processo.EnderecoInicialMemoria + i] = false;
+                    paginas[processo.TabelaPaginas[i]] = false; // Libera a página
+
                 }
-                Console.WriteLine($"Memória liberada do Processo {processo.ID}.");
             }
+            else
+            {
+                Console.WriteLine("Processo não possui páginas alocadas.");
+            }
+            processo.TabelaPaginas.Clear();
+            Console.WriteLine($"Memória liberada do Processo {processo.ID}.");
+
         }
     }
 }

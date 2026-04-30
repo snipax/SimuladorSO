@@ -16,7 +16,7 @@ namespace SimuladorSO.Models
         public int QuantumRestante { get; set; }
         public int TempoBloqueioRestante { get; set; }
         public int TamanhoMemoria { get; private set; }
-        public int EnderecoInicialMemoria { get; set; }
+        public List<int> TabelaPaginas { get; set; }
         public NivelPrioridade Prioridade { get; set; }
         public int TempoChegada { get; set; }
         public int TempoInicioExecucao{ get; set; }
@@ -35,7 +35,7 @@ namespace SimuladorSO.Models
             Prioridade = prioridade;
             TempoTotal = tempototal;
             TempoDeExecucao = 0; 
-            EnderecoInicialMemoria = -1; // Indica que a memória ainda não foi alocada
+            TabelaPaginas = new List<int>();
         }
     }
 }
