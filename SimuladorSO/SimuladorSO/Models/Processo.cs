@@ -17,13 +17,15 @@ namespace SimuladorSO.Models
         public int TempoBloqueioRestante { get; set; }
         public int TamanhoMemoria { get; private set; }
         public int EnderecoInicialMemoria { get; set; }
+        public NivelPrioridade Prioridade { get; set; }
 
-        public Processo(int id, string nome, int tamanhoMemoria, int tempototal)
+        public Processo(int id, string nome, int tamanhoMemoria, int tempototal, NivelPrioridade prioridade)
         {
             ID = id;
             Nome = nome;
             TamanhoMemoria = tamanhoMemoria;
             Status = ProcessState.Pronto;
+            Prioridade = prioridade;
             TempoTotal = tempototal;
             TempoDeExecucao = 0; 
             EnderecoInicialMemoria = -1; // Indica que a memória ainda não foi alocada

@@ -18,9 +18,9 @@ namespace SimuladorSO
             Escalonador escalonador = new Escalonador(gm);
 
             // Adiciona processos ao sistema
-            escalonador.AdicionarProcesso(new Processo(1, "Notepad", 10, 5));
-            escalonador.AdicionarProcesso(new Processo(2, "Paint", 20, 15));
-            escalonador.AdicionarProcesso(new Processo(3, "Chrome", 50, 30));
+            escalonador.AdicionarProcesso(new Processo(1, "Notepad", 10, 5, NivelPrioridade.Alta));
+            escalonador.AdicionarProcesso(new Processo(2, "Paint", 20, 15, NivelPrioridade.Media));
+            escalonador.AdicionarProcesso(new Processo(3, "Chrome", 50, 30, NivelPrioridade.Baixa));
 
             Console.WriteLine("\n--- Iniciando Simulação do Sistema Operacional ---\n");
 
@@ -47,7 +47,10 @@ namespace SimuladorSO
                             int.TryParse(Console.ReadLine(), out int memoria);
                             Console.WriteLine("Digite o tempo total de execução:");
                             int.TryParse(Console.ReadLine(), out int tempoTotal);
-                            escalonador.AdicionarProcesso(new Processo(id, nome, memoria, tempoTotal));
+                            Console.WriteLine("Digite a prioridade do processo (Alta, Media, Baixa):");
+                            string prioridadeInput = Console.ReadLine();
+                            NivelPrioridade prioridade = Enum.TryParse<NivelPrioridade>(prioridadeInput, true, out NivelPrioridade temp) ? temp : NivelPrioridade.Baixa;
+                            escalonador.AdicionarProcesso(new Processo(id, nome, memoria, tempoTotal, prioridade));
                             break;
 
                         case "stop":
