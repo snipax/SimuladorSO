@@ -11,13 +11,15 @@ namespace SimuladorSO.Core
     public class Escalonador
     {
         
-        private  Queue<Processo> processosBloqueados;
+        private Queue<Processo> processosBloqueados;
         private Queue<Processo> processosPrioridadeAlta;
         private Queue<Processo> processosPrioridadeMedia;
         private Queue<Processo> processosPrioridadeBaixa;
+        private Queue<Processo> processosFinalizados;
 
         private GerenciadorDeMemoria gerenciadorMemoria;
         private int quantum = 2;
+        private int ciclos = 0;
 
         public Escalonador(GerenciadorDeMemoria gm)
         {
@@ -25,6 +27,7 @@ namespace SimuladorSO.Core
             processosPrioridadeMedia = new Queue<Processo>();
             processosPrioridadeBaixa = new Queue<Processo>();
             processosBloqueados = new Queue<Processo>();
+            processosFinalizados = new Queue<Processo>();
             gerenciadorMemoria = gm;
         }
 
@@ -33,6 +36,7 @@ namespace SimuladorSO.Core
             if (gerenciadorMemoria.Alocar(p))
             {
                 p.Status = ProcessState.Pronto;
+                p.TempoChegada = ciclos;
                 switch (p.Prioridade)
                 {
                     case NivelPrioridade.Alta:
@@ -161,9 +165,36 @@ namespace SimuladorSO.Core
             }
         }
 
+        public void ExibirMetricas()
+        {
+            if (processosFinalizados.Count == 0)
+            {
+                Console.WriteLine("--- Nenhum processo finalizado ---");
+                return;
+            }
+            
+            Console.WriteLine("--- Processos Finalizados ---");
+            foreach (var processo in processosFinalizados)
+            {
+                Console.WriteLine($"ID: {processo.ID} - Nome: {processo.Nome} Status: {processo.Status} Tempo de execução: {processo.TempoDeExecucao}, Tempo de espera: {processo.TempoEspera}, Turnaround: {processo.TempoTurnaround}");
+            }
+
+            int tempoEsperaTotal = processosFinalizados.Sum(p => p.TempoEspera);
+            int tempoExecucaoTotal = processosFinalizados.Sum(p => p.TempoDeExecucao);
+            int tempoTurnaroundTotal = processosFinalizados.Sum(p => p.TempoTurnaround);
+            int quantidadeProcessos = processosFinalizados.Count;
+
+            Console.WriteLine("--- Métricas de Desempenho ---");
+            Console.WriteLine($"Tempo médio de espera: {(double)tempoEsperaTotal / quantidadeProcessos}");
+            Console.WriteLine($"Tempo médio de execução: {(double)tempoExecucaoTotal / quantidadeProcessos}");
+            Console.WriteLine($"Tempo médio de turnaround: {(double)tempoTurnaroundTotal / quantidadeProcessos}");
+            Console.WriteLine($"Throughput: {(double)quantidadeProcessos / ciclos}");
+        }
+
 
         public void ExecutarCicloDaCPU()
         {
+            ciclos ++;
             if (processosBloqueados.Count > 0)
             {
                 int bloqueadosCount = processosBloqueados.Count;
@@ -218,6 +249,10 @@ namespace SimuladorSO.Core
                 {
                     processoAtual.QuantumRestante = quantum;
                 }
+                if (processoAtual.TempoDeExecucao == 0)
+                {
+                    processoAtual.TempoInicioExecucao = ciclos;
+                }
                 Console.WriteLine($"--> Executando processo ID: {processoAtual.ID} ({processoAtual.Nome})");
 
                 Thread.Sleep(500);
@@ -226,25 +261,31 @@ namespace SimuladorSO.Core
 
                 if (processoAtual.TempoDeExecucao >= processoAtual.TempoTotal)
                 {
+                    processoAtual.TempoConclusao = ciclos;
+                    processoAtual.TempoTurnaround = processoAtual.TempoConclusao - processoAtual.TempoChegada;
+                    processoAtual.TempoEspera = processoAtual.TempoTurnaround - processoAtual.TempoTotal;
                     switch (processoAtual.Prioridade)
                     {
                         case NivelPrioridade.Alta:
                             processoAtual.Status = ProcessState.Finalizado;
-                            Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}.");
+                            Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}. Tempo de execução: {processoAtual.TempoDeExecucao}, Tempo de espera: {processoAtual.TempoEspera}, Turnaround: {processoAtual.TempoTurnaround}");
                             gerenciadorMemoria.Liberar(processoAtual);
                             processosPrioridadeAlta.Dequeue();
+                            processosFinalizados.Enqueue(processoAtual);
                             break;
                         case NivelPrioridade.Media:
                             processoAtual.Status = ProcessState.Finalizado;
-                            Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}.");
+                            Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}. Tempo de execução: {processoAtual.TempoDeExecucao}, Tempo de espera: {processoAtual.TempoEspera}, Turnaround: {processoAtual.TempoTurnaround}");
                             gerenciadorMemoria.Liberar(processoAtual);
                             processosPrioridadeMedia.Dequeue();
+                            processosFinalizados.Enqueue(processoAtual);
                             break;
                         case NivelPrioridade.Baixa:
                             processoAtual.Status = ProcessState.Finalizado;
-                            Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}.");
+                            Console.WriteLine($"Processo ID: {processoAtual.ID} ({processoAtual.Nome}) {processoAtual.Status}. Tempo de execução: {processoAtual.TempoDeExecucao}, Tempo de espera: {processoAtual.TempoEspera}, Turnaround: {processoAtual.TempoTurnaround}");
                             gerenciadorMemoria.Liberar(processoAtual);
                             processosPrioridadeBaixa.Dequeue();
+                            processosFinalizados.Enqueue(processoAtual);
                             break;
                     }
                 }

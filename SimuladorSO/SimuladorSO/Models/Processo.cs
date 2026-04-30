@@ -18,6 +18,13 @@ namespace SimuladorSO.Models
         public int TamanhoMemoria { get; private set; }
         public int EnderecoInicialMemoria { get; set; }
         public NivelPrioridade Prioridade { get; set; }
+        public int TempoChegada { get; set; }
+        public int TempoInicioExecucao{ get; set; }
+        public int TempoConclusao { get; set; }
+        public int TempoTurnaround { get; set; }
+        public int TempoEspera { get; set; }
+
+
 
         public Processo(int id, string nome, int tamanhoMemoria, int tempototal, NivelPrioridade prioridade)
         {

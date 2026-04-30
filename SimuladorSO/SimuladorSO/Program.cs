@@ -32,7 +32,7 @@ namespace SimuladorSO
 
                 if (ciclos % 5 == 0)
                 {
-                    Console.WriteLine("--- comando (add, stop, block, list, continue, exit) ---");
+                    Console.WriteLine("--- comando (add, stop, block, list, metrics, continue, exit) ---");
                     string option = Console.ReadLine();
                     option = option.ToLowerInvariant();
                     switch (option) 
@@ -76,6 +76,11 @@ namespace SimuladorSO
                             escalonador.ListarProcessos();
                             break;
 
+                        case "metrics":
+                            Console.WriteLine("--- Métricas de Desempenho ---");
+                            escalonador.ExibirMetricas();
+                            break;
+
                         case "continue":
                             Console.WriteLine("--- Continuando simulaçao ---");
                             break;
@@ -85,7 +90,7 @@ namespace SimuladorSO
                             return;
 
                         default:
-                            Console.WriteLine("--- comando (add, stop, block, list, continue, exit) ---");
+                            Console.WriteLine("--- comando (add, stop, block, list, metrics, continue, exit) ---");
                             break;
                     }
                 }
